@@ -1,25 +1,27 @@
-### git
-```bash
-git clone https://github.com/moukail/traefik-reverse-proxy.git
-```
-
-#### Install in Ubuntu
+### mkcert
+#### For Ubuntu
 ```bash
 sudo apt install mkcert libnss3-tools
 ```
 
-#### Mac
-todo 
-
-#### generate certs
+#### For Mac
 ```bash
-mkcert -install
-mkcert -cert-file certs/cert.pem -key-file certs/key.pem "app.localhost" "*.app.localhost"
+brew install mkcert
 ```
 
-#### generate pkcs12
+#### install CA cert
 ```bash
-openssl pkcs12 -export -out certs/certificate.p12 -inkey certs/key.pem -in certs/cert.pem
+mkcert -install
+```
+
+### git
+```bash
+git clone https://github.com/moukail/traefik-reverse-proxy.git
+cd traefik-reverse-proxy
+```
+### generate certs
+```bash
+mkcert -cert-file certs/cert.pem -key-file certs/key.pem "app.localhost" "*.app.localhost"
 ```
 
 ### Docker
