@@ -14,7 +14,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "3306:3306"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Map the static configuration into the container
@@ -25,7 +24,8 @@ services:
       - ./certs:/etc/certs:ro
 
   whoami:
-    image: containous/whoami
+    image: traefik/whoami
+    container_name: whoami
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.app.localhost`)"

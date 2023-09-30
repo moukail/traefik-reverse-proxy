@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial: Setting Up Traefik Reverse Proxy with mkcert and Docker Compose</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="mb-4">Tutorial: Setting Up Traefik Reverse Proxy with mkcert and Docker Compose</h1>
+
+    <p>This tutorial will walk you through the process of setting up Traefik as a reverse proxy for your applications using <code>mkcert</code> to generate SSL certificates and Docker Compose for container orchestration.</p>
+
+    <h2>Prerequisites</h2>
+    <p>Before you begin, make sure you have the following prerequisites installed:</p>
+    <ul>
+        <li>Docker: <a href="https://docs.docker.com/get-docker/">Install Docker</a></li>
+        <li><code>docker-compose</code>: <a href="https://docs.docker.com/compose/install/">Install Docker Compose</a></li>
+        <li><code>mkcert</code>: <a href="https://github.com/FiloSottile/mkcert#installation">Install mkcert</a></li>
+    </ul>
+
+    <h2>Step 1: Install <code>mkcert</code></h2>
+    <p>First, we'll install <code>mkcert</code>, a tool for generating locally-trusted SSL certificates.</p>
+
+    <h3>For Ubuntu</h3>
+    <p>Open your terminal and run:</p>
+    <pre><code>sudo apt install mkcert libnss3-tools</code></pre>
+
+    <h3>For macOS (Homebrew)</h3>
+    <p>Open your terminal and run:</p>
+    <pre><code>brew install mkcert</code></pre>
+
+    <p>After installation, install the CA certificate:</p>
+    <pre><code>mkcert -install</code></pre>
+
+    <h2>Step 3: Generate SSL Certificates</h2>
+    <p>Generate SSL certificates for your domain (e.g., <code>app.localhost</code> and <code>*.app.localhost</code>):</p>
+    <pre><code>mkcert -cert-file certs/cert.pem -key-file certs/key.pem "app.localhost" "*.app.localhost"</code></pre>
+
+    <!-- Step 4: Create docker-compose.yml -->
+    <h2>Step 4: Create docker-compose.yml</h2>
+    <p>Create a <code>docker-compose.yml</code> file in the same directory where you cloned the Traefik reverse proxy repository. Add the following configuration to the file:</p>
+
+    <pre><code class="language-yaml">
+version: '3.9'
+
+services:
+  reverse-proxy:
+    image: traefik:2.10
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik=true"
+      - "traefik.http.routers.traefik.tls=true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config/traefik.yaml:/etc/traefik/traefik.yaml:ro
+      - ./config/traefik_dynamic.yaml:/etc/traefik/dynamic.yaml:ro
+      - ./certs:/etc/certs:ro
+
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.app.localhost`)"
+      - "traefik.http.routers.whoami.tls=true"
+
+networks:
+  default:
+    name: traefik_net
+        </code></pre>
+
+    <!-- Step 5: Create traefik.yaml -->
+    <h2>Step 5: Create traefik.yaml</h2>
+    <p>Create a <code>traefik.yaml</code> file in the <code>config</code> directory of your Traefik reverse proxy project. Add the following configuration to the file:</p>
+
+    <pre><code class="language-yaml">
+global:
+  sendAnonymousUsage: false
+
+api:
+  dashboard: true
+  insecure: true
+
+log:
+  level: DEBUG
+  format: common
+
+providers:
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    watch: true
+    exposedbydefault: false
+
+  file:
+    filename: /etc/traefik/dynamic.yaml
+    watch: true
+
+entryPoints:
+  mysql:
+    address: ":3306"
+  web:
+    address: ':80'
+    http:
+      redirections:
+        entryPoint:
+          to: web_secure
+          scheme: https
+
+  web_secure:
+    address: ':443'
+        </code></pre>
+
+    <h2>Step 6: Create traefik_dynamic.yaml</h2>
+    <p>Create a <code>traefik_dynamic.yaml</code> file in the <code>config</code> directory of your Traefik reverse proxy project. Add the following configuration to the file:</p>
+
+    <pre><code class="language-yaml">
+http:
+  routers:
+    traefik:
+      rule: "Host(`traefik.app.localhost`)"
+      service: "api@internal"
+      tls:
+        domains:
+          - main: "app.localhost"
+            sans:
+              - "*.app.localhost"
+
+tls:
+  certificates:
+    - certFile: "/etc/certs/cert.pem"
+      keyFile: "/etc/certs/key.pem"
+        </code></pre>
+
+    <!-- Step 6: Run Docker Compose -->
+    <h2>Step 7: Run Docker Compose</h2>
+    <p>Start the Traefik reverse proxy and associated containers:</p>
+    <pre><code>docker-compose up -d --build</code></pre>
+
+    <h2>Step 8: Access the Traefik Dashboard</h2>
+    <p>Access the Traefik dashboard to manage your reverse proxy configuration. Open your web browser and go to:</p>
+    <p><a href="https://traefik.app.localhost/dashboard/#/">https://traefik.app.localhost/dashboard/#/</a></p>
+
+    <h2>Conclusion</h2>
+    <p>Congratulations! You have successfully set up Traefik as a reverse proxy using <code>mkcert</code> for SSL certificates and Docker Compose for container orchestration. Your applications can now securely communicate with the internet through the reverse proxy.</p>
+
+    <p>This tutorial provides a foundation for securing and managing your applications using Traefik, and you can customize it further to suit your specific needs.</p>
+
+    <p>If you have any questions or need further assistance, feel free to reach out. Happy proxying!</p>
+    <a href="https://github.com/moukail/traefik-reverse-proxy">https://github.com/moukail/traefik-reverse-proxy</a>
+</div>
+
+<!-- Include Bootstrap JS (Optional) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
