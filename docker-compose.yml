@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  reverse-proxy:
+    image: traefik:2.10
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik=true"
+      - "traefik.http.routers.traefik.tls=true"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "3306:3306"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Map the static configuration into the container
+      - ./config/traefik.yaml:/etc/traefik/traefik.yaml:ro
+      # Map the dynamic configuration into the container
+      - ./config/traefik_dynamic.yaml:/etc/traefik/dynamic.yaml:ro
+      # Map the certificats into the container
+      - ./certs:/etc/certs:ro
+
+  whoami:
+    image: containous/whoami
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.app.localhost`)"
+      - "traefik.http.routers.whoami.tls=true"
+
+networks:
+  default:
+    name: traefik_net
