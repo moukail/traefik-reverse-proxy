@@ -20,8 +20,6 @@ providers:
     watch: true
 
 entryPoints:
-  mysql:
-    address: ":3306"
   web:
     address: ':80'
     http:
