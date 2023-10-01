@@ -6,6 +6,34 @@
     <title>Tutorial: Setting Up Traefik Reverse Proxy with mkcert and Docker Compose</title>
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom CSS for dark code block */
+        .dark-code {
+            background-color: #2d2d2d;
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            position: relative; /* Added for positioning */
+        }
+
+        /* Custom CSS for the copy button */
+        .copy-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+        }
+
+        /* Custom CSS for the "Copied" status */
+        .status1,
+        .status2 {
+            display: inline-block;
+        }
+
+        .status2 {
+            display: none; /* Initially hidden */
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-5">
@@ -26,24 +54,38 @@
 
     <h3>For Ubuntu</h3>
     <p>Open your terminal and run:</p>
-    <pre><code>sudo apt install mkcert libnss3-tools</code></pre>
+    <pre class="dark-code">
+        <button class="btn btn-secondary copy-button" onclick="copyToClipboard('code1')"><span class="status1">Copy</span><span class="status2">Copied</span></button>
+        <code id="code1">sudo apt install mkcert libnss3-tools</code>
+    </pre>
 
     <h3>For macOS (Homebrew)</h3>
     <p>Open your terminal and run:</p>
-    <pre><code>brew install mkcert</code></pre>
+    <pre class="dark-code">
+        <button class="btn btn-secondary copy-button" onclick="copyToClipboard('code2')"><span class="status1">Copy</span><span class="status2">Copied</span></button>
+        <code id="code2">brew install mkcert</code>
+    </pre>
 
     <p>After installation, install the CA certificate:</p>
-    <pre><code>mkcert -install</code></pre>
+    <pre class="dark-code">
+        <button class="btn btn-secondary copy-button" onclick="copyToClipboard('code3')"><span class="status1">Copy</span><span class="status2">Copied</span></button>
+        <code id="code3">mkcert -install</code>
+    </pre>
 
     <h2>Step 3: Generate SSL Certificates</h2>
     <p>Generate SSL certificates for your domain (e.g., <code>app.localhost</code> and <code>*.app.localhost</code>):</p>
-    <pre><code>mkcert -cert-file certs/cert.pem -key-file certs/key.pem "app.localhost" "*.app.localhost"</code></pre>
+    <pre class="dark-code">
+        <button class="btn btn-secondary copy-button" onclick="copyToClipboard('code4')"><span class="status1">Copy</span><span class="status2">Copied</span></button>
+        <code id="code4">mkcert -cert-file certs/cert.pem -key-file certs/key.pem "app.localhost" "*.app.localhost"</code>
+    </pre>
 
     <!-- Step 4: Create docker-compose.yml -->
     <h2>Step 4: Create docker-compose.yml</h2>
     <p>Create a <code>docker-compose.yml</code> file in the same directory where you cloned the Traefik reverse proxy repository. Add the following configuration to the file:</p>
 
-    <pre><code class="language-yaml">
+    <pre class="dark-code">
+        <button class="btn btn-secondary copy-button" onclick="copyToClipboard('code5')"><span class="status1">Copy</span><span class="status2">Copied</span></button>
+        <code id="code5" class="language-yaml">
 version: '3.9'
 
 services:
@@ -77,13 +119,16 @@ services:
 networks:
   default:
     name: traefik_net
-        </code></pre>
+        </code>
+    </pre>
 
     <!-- Step 5: Create traefik.yaml -->
     <h2>Step 5: Create traefik.yaml</h2>
     <p>Create a <code>traefik.yaml</code> file in the <code>config</code> directory of your Traefik reverse proxy project. Add the following configuration to the file:</p>
 
-    <pre><code class="language-yaml">
+    <pre class="dark-code">
+        <button class="btn btn-secondary copy-button" onclick="copyToClipboard('code6')"><span class="status1">Copy</span><span class="status2">Copied</span></button>
+        <code id="code6" class="language-yaml">
 global:
   sendAnonymousUsage: false
 
@@ -118,12 +163,15 @@ entryPoints:
 
   web_secure:
     address: ':443'
-        </code></pre>
+        </code>
+    </pre>
 
     <h2>Step 6: Create traefik_dynamic.yaml</h2>
     <p>Create a <code>traefik_dynamic.yaml</code> file in the <code>config</code> directory of your Traefik reverse proxy project. Add the following configuration to the file:</p>
 
-    <pre><code class="language-yaml">
+    <pre class="dark-code">
+        <button class="btn btn-secondary copy-button" onclick="copyToClipboard('code7')"><span class="status1">Copy</span><span class="status2">Copied</span></button>
+        <code id="code7" class="language-yaml">
 http:
   routers:
     traefik:
@@ -139,16 +187,19 @@ tls:
   certificates:
     - certFile: "/etc/certs/cert.pem"
       keyFile: "/etc/certs/key.pem"
-        </code></pre>
+        </code>
+    </pre>
 
     <!-- Step 6: Run Docker Compose -->
     <h2>Step 7: Run Docker Compose</h2>
     <p>Start the Traefik reverse proxy and associated containers:</p>
-    <pre><code>docker-compose up -d --build</code></pre>
+    <pre class="dark-code">
+        <button class="btn btn-secondary copy-button" onclick="copyToClipboard('code8')"><span class="status1">Copy</span><span class="status2">Copied</span></button>
+        <code id="code8">docker-compose up -d --build</code></pre>
 
     <h2>Step 8: Access the Traefik Dashboard</h2>
     <p>Access the Traefik dashboard to manage your reverse proxy configuration. Open your web browser and go to:</p>
-    <p><a href="https://traefik.app.localhost/dashboard/#/">https://traefik.app.localhost/dashboard/#/</a></p>
+    <p><a href="https://traefik.app.localhost/dashboard/#/" target="_blank">https://traefik.app.localhost/dashboard/#/</a></p>
 
     <h2>Conclusion</h2>
     <p>Congratulations! You have successfully set up Traefik as a reverse proxy using <code>mkcert</code> for SSL certificates and Docker Compose for container orchestration. Your applications can now securely communicate with the internet through the reverse proxy.</p>
@@ -158,6 +209,33 @@ tls:
     <p>If you have any questions or need further assistance, feel free to reach out. Happy proxying!</p>
     <a href="https://github.com/moukail/traefik-reverse-proxy">https://github.com/moukail/traefik-reverse-proxy</a>
 </div>
+
+<!-- Copy to Clipboard Script -->
+<script>
+    function copyToClipboard(elementId) {
+        var copyText = document.getElementById(elementId);
+        var textArea = document.createElement("textarea");
+        textArea.value = copyText.textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+
+        // Toggle the visibility of the "Copy" button and "Copied" status using jQuery
+        var copyButton = $('#' + elementId).siblings('.copy-button');
+        var status1 = copyButton.find('.status1');
+        var status2 = copyButton.find('.status2');
+
+        status1.hide();
+        status2.show();
+
+        // Hide "Copied" after 1.5 seconds
+        setTimeout(function () {
+            status1.show();
+            status2.hide();
+        }, 1500); // Display "Copied" for 1.5 seconds
+    }
+</script>
 
 <!-- Include Bootstrap JS (Optional) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
