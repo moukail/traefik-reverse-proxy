@@ -25,6 +25,7 @@ Clone the Traefik reverse proxy repository:
 git clone https://github.com/moukail/traefik-reverse-proxy.git
 cd traefik-reverse-proxy
 ```
+
 ### Step 3: Generate SSL Certificates
 Generate SSL certificates for your domain (e.g., app.localhost):
 ```bash
