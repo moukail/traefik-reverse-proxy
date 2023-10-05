@@ -30,3 +30,11 @@ entryPoints:
 
   web_secure:
     address: ':443'
+
+certificatesResolvers:
+  my_resolver:
+    acme:
+      email: moukafih@live.nl
+      storage: "/letsencrypt/acme.json"
+      httpChallenge:
+        entryPoint: web

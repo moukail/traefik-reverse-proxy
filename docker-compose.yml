@@ -22,6 +22,7 @@ services:
       - ./config/traefik_dynamic.yaml:/etc/traefik/dynamic.yaml:ro
       # Map the certificats into the container
       - ./certs:/etc/certs:ro
+      - ./certs:/letsencrypt
 
   whoami:
     image: traefik/whoami
