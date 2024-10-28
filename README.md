@@ -47,3 +47,10 @@ https://traefik.app.localhost/dashboard/#/
 These instructions help you set up a secure reverse proxy with Traefik, ensuring secure communication between your applications and the internet.
 
 https://doc.traefik.io/traefik/getting-started/concepts/
+
+
+
+
+
+docker run goacme/lego -h
+docker run goacme/lego --accept-tos --key-type rsa4096 --email="moukafih@live.nl" --domains="moukafih.nl" --http run
